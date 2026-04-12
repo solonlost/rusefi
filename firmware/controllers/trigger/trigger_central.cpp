@@ -848,6 +848,27 @@ void TriggerCentral::handleShaftSignal(trigger_event_e signal, efitick_t timesta
 	efiAssertVoid(ObdCode::CUSTOM_TRIGGER_EVENT_TYPE, eventIndex >= 0 && eventIndex < HW_EVENT_TYPES, "signal type");
 	hwEventCounters[eventIndex]++;
 
+auto triggerType = primaryTriggerConfiguration.TriggerType.type;
+
+if (triggerType == trigger_type_e::TT_CITROEN_CX_145M1_CRANK ||
+    triggerType == trigger_type_e::TT_CITROEN_CX_145P1_CRANK) {
+
+    static int cxToothCount = 0;
+//    static trigger_event_e cxPrevSignal = SHAFT_PRIMARY_RISING;
+
+    // For now only count primary rising edges
+    if (signal == SHAFT_PRIMARY_RISING) {
+        cxToothCount++;
+
+        if (cxToothCount >= 145) {
+            cxToothCount = 0;
+        }
+    }
+
+//    cxPrevSignal = signal;
+    return;
+}
+
 	// Decode the trigger!
 	auto decodeResult = triggerState.decodeTriggerEvent(
 			"trigger",
