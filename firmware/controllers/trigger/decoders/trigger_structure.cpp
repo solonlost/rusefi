@@ -449,12 +449,23 @@ void TriggerWaveform::setThirdTriggerSynchronizationGap(float syncRatio) {
 }
 
 PUBLIC_API_WEAK void customTrigger(operation_mode_e triggerOperationMode, TriggerWaveform *s, trigger_type_e type) {
-  if (type == trigger_type_e::TT_CUSTOM_1 || type == trigger_type_e::TT_CUSTOM_2) {
-    initializeSkippedToothTrigger(s, 1, 0, triggerOperationMode, SyncEdge::Rise);
-    return;
-  }
+	switch (type) {
+	case trigger_type_e::TT_CUSTOM_1:
+	case trigger_type_e::TT_CUSTOM_2:
+		initializeSkippedToothTrigger(s, 1, 0, triggerOperationMode, SyncEdge::Rise);
+		return;
+
+	case trigger_type_e::TT_CITROEN_CX_145P1_CRANK:
+	case trigger_type_e::TT_CITROEN_CX_145M1_CRANK:
+		s->setShapeDefinitionError(true);
+		warning(ObdCode::CUSTOM_ERR_NO_SHAPE, "Citroen CX trigger placeholder: %d", type);
+		return;
+
+	default:
 		s->setShapeDefinitionError(true);
 		warning(ObdCode::CUSTOM_ERR_NO_SHAPE, "initializeTriggerWaveform() not implemented: %d", type);
+		return;
+	}
 }
 
 /**
@@ -851,7 +862,20 @@ void TriggerWaveform::initializeTriggerWaveform(operation_mode_e triggerOperatio
 		initializeJeepRenix66_2_2(this);
 		break;
 
+<<<<<<< HEAD
 	case trigger_type_e::TT_VIPER_V10_CRANK:
+=======
+	case trigger_type_e::TT_CITROEN_CX_145M1_CRANK:
+		setShapeDefinitionError(true);
+		warning(ObdCode::CUSTOM_ERR_NO_SHAPE, "Citroen CX trigger placeholder: %d", triggerType.type);
+		break;
+    
+	case trigger_type_e::TT_CITROEN_CX_145P1_CRANK:
+		setShapeDefinitionError(true);
+		warning(ObdCode::CUSTOM_ERR_NO_SHAPE, "Citroen CX trigger placeholder: %d", triggerType.type);
+		break;
+    
+>>>>>>> 5dacc23ae8 (Add Citroen CX trigger enum hooks)
 	case trigger_type_e::TT_UNUSED_98:
 	case trigger_type_e::TT_SUBARU_7_6_CRANK:
 		initializeSubaru7_6_crankOnly(this);

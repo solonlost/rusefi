@@ -101,8 +101,13 @@ public enum trigger_type_e {
 	TT_JEEPRENIX_66_2_2_2,
 	TT_SUBARU_7_6_CRANK,
 	TT_SUZUKI_G16B,
+<<<<<<< HEAD
 	TT_VIPER_V10_CRANK,
 	TT_VVT_MITSUBISHI_6G75,
+=======
+	TT_CITROEN_CX_145P1_CRANK,
+	TT_CITROEN_CX_145M1_CRANK,
+>>>>>>> 5dacc23ae8 (Add Citroen CX trigger enum hooks)
 	TT_UNUSED_98,
 	TT_UNUSED,
 }

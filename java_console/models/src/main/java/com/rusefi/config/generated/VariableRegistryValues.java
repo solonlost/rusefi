@@ -1577,6 +1577,8 @@ public class VariableRegistryValues {
 	public static final int trigger_type_e_TT_BENELLI_TRE = 21;
 	public static final int trigger_type_e_TT_CHRYSLER_NGC_36_2_2 = 30;
 	public static final int trigger_type_e_TT_CHRYSLER_PHASER = 90;
+	public static final int trigger_type_e_TT_CITROEN_CX_145M1_CRANK = 97;
+	public static final int trigger_type_e_TT_CITROEN_CX_145P1_CRANK = 96;
 	public static final int trigger_type_e_TT_CUSTOM_1 = 88;
 	public static final int trigger_type_e_TT_CUSTOM_2 = 89;
 	public static final int trigger_type_e_TT_DAIHATSU_3_CYL = 6;
@@ -1646,8 +1648,13 @@ public class VariableRegistryValues {
 	public static final int trigger_type_e_TT_TOYOTA_3_TOOTH_UZ = 91;
 	public static final int trigger_type_e_TT_TRI_TACH = 53;
 	public static final int trigger_type_e_TT_UNUSED = 99;
+<<<<<<< HEAD
 	public static final int trigger_type_e_TT_UNUSED_98 = 98;
 	public static final int trigger_type_e_TT_VIPER_V10_CRANK = 96;
+=======
+	public static final int trigger_type_e_TT_UNUSED_39 = 39;
+	public static final int trigger_type_e_TT_UNUSED_98 = 98;
+>>>>>>> 5dacc23ae8 (Add Citroen CX trigger enum hooks)
 	public static final int trigger_type_e_TT_VVT_BARRA_3_PLUS_1 = 56;
 	public static final int trigger_type_e_TT_VVT_BOSCH_QUICK_START = 47;
 	public static final int trigger_type_e_TT_VVT_FORD_COYOTE = 4;
