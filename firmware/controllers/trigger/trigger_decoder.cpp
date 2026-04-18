@@ -35,6 +35,7 @@ std::optional<setup_custom_board_overrides_type> custom_board_TriggerResetState;
  * decoder uses TriggerStimulatorHelper in findTriggerZeroEventIndex
  */
 #include "trigger_simulator.h"
+#include "trigger_citroen_cx.h"
 
 #ifndef NOISE_RATIO_THRESHOLD
 #define NOISE_RATIO_THRESHOLD 3000
@@ -123,6 +124,13 @@ bool printTriggerTrace = false;
 
 void TriggerWaveform::initializeSyncPoint(TriggerDecoderBase& state,
 			const TriggerConfiguration& triggerConfiguration) {
+	// CX 145-tooth triggers use a custom decoder that bypasses TriggerWaveform.
+	// The stub shape cannot pass findTriggerZeroEventIndex, so skip it.
+	if (triggerConfiguration.TriggerType.type == trigger_type_e::TT_CITROEN_CX_145M1_CRANK ||
+	    triggerConfiguration.TriggerType.type == trigger_type_e::TT_CITROEN_CX_145P1_CRANK) {
+		triggerShapeSynchPointIndex = 0;
+		return;
+	}
 	triggerShapeSynchPointIndex = state.findTriggerZeroEventIndex(*this, triggerConfiguration);
 }
 
