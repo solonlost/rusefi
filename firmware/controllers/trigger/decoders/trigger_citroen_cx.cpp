@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "trigger_citroen_cx.h"
+#include "trigger_universal.h"
 
 static CitroenCxTriggerState s_cxState;
 
@@ -64,11 +65,7 @@ bool handleCitroenCxTrigger(trigger_type_e triggerType, trigger_event_e signal, 
 }
 
 void initializeCitroenCxStub(TriggerWaveform *s) {
-	// Placeholder shape — actual decoding is handled in handleCitroenCxTrigger().
-	// A real TriggerWaveform cannot be defined for 145 teeth due to PWM_PHASE_MAX_COUNT=280.
-	// This stub exists solely to prevent shapeDefinitionError and the early return
-	// in handleShaftSignal. It is never used for actual decoding.
-	s->initialize(FOUR_STROKE_CRANK_SENSOR, SyncEdge::RiseOnly);
+	// Stub shape — real decoding bypasses TriggerWaveform due to PWM_PHASE_MAX_COUNT limit.
+	initializeSkippedToothTrigger(s, 1, 0, FOUR_STROKE_CRANK_SENSOR, SyncEdge::RiseOnly);
 	s->isSynchronizationNeeded = false;
-	s->addEvent360(180.0f, TriggerValue::RISE, TriggerWheel::T_PRIMARY);
 }
