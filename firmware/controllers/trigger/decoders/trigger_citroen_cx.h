@@ -25,3 +25,5 @@ struct CitroenCxTriggerState {
 void resetCitroenCxTriggerState();
 bool handleCitroenCxTrigger(trigger_type_e triggerType, trigger_event_e signal, efitick_t timestamp);
 const CitroenCxTriggerState& getCitroenCxTriggerState();
+
+void initializeCitroenCxStub(TriggerWaveform *s);

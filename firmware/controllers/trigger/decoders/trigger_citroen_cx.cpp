@@ -35,6 +35,7 @@ static void handleSecondarySync145P1(CitroenCxTriggerState& s) {
 }
 
 static void handleCamSync145(CitroenCxTriggerState& s) {
+	s.crankSynced = true;
 	s.phaseSynced = true;
 	s.syncSource = CxSyncSource::CamPulse;
 }
@@ -44,30 +45,30 @@ bool handleCitroenCxTrigger(trigger_type_e triggerType, trigger_event_e signal, 
 	case trigger_type_e::TT_CITROEN_CX_145P1_CRANK:
 		if (signal == SHAFT_PRIMARY_RISING) {
 			handlePrimaryRise145(s_cxState, timestamp);
-			return true;
 		}
-
 		if (signal == SHAFT_SECONDARY_RISING) {
 			handleSecondarySync145P1(s_cxState);
-			return true;
 		}
-
-		return true;
-
+		return false;
 	case trigger_type_e::TT_CITROEN_CX_145M1_CRANK:
 		if (signal == SHAFT_PRIMARY_RISING) {
 			handlePrimaryRise145(s_cxState, timestamp);
-			return true;
 		}
-
 		if (signal == SHAFT_SECONDARY_RISING) {
 			handleCamSync145(s_cxState);
-			return true;
 		}
-
-		return true;
-
+		return false;
 	default:
 		return false;
 	}
+}
+
+void initializeCitroenCxStub(TriggerWaveform *s) {
+	// Placeholder shape — actual decoding is handled in handleCitroenCxTrigger().
+	// A real TriggerWaveform cannot be defined for 145 teeth due to PWM_PHASE_MAX_COUNT=280.
+	// This stub exists solely to prevent shapeDefinitionError and the early return
+	// in handleShaftSignal. It is never used for actual decoding.
+	s->initialize(FOUR_STROKE_CRANK_SENSOR, SyncEdge::RiseOnly);
+	s->isSynchronizationNeeded = false;
+	s->addEvent360(180.0f, TriggerValue::RISE, TriggerWheel::T_PRIMARY);
 }

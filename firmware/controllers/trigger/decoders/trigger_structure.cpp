@@ -38,6 +38,7 @@
 #include "trigger_vw.h"
 #include "trigger_universal.h"
 #include "trigger_mercedes.h"
+#include "trigger_citroen_cx.h"
 #include "engine_state.h"
 
 void wrapAngle(angle_t& angle, const char* msg, ObdCode code) {
@@ -454,13 +455,6 @@ PUBLIC_API_WEAK void customTrigger(operation_mode_e triggerOperationMode, Trigge
 	case trigger_type_e::TT_CUSTOM_2:
 		initializeSkippedToothTrigger(s, 1, 0, triggerOperationMode, SyncEdge::Rise);
 		return;
-
-	case trigger_type_e::TT_CITROEN_CX_145P1_CRANK:
-	case trigger_type_e::TT_CITROEN_CX_145M1_CRANK:
-		s->setShapeDefinitionError(true);
-		warning(ObdCode::CUSTOM_ERR_NO_SHAPE, "Citroen CX trigger placeholder: %d", type);
-		return;
-
 	default:
 		s->setShapeDefinitionError(true);
 		warning(ObdCode::CUSTOM_ERR_NO_SHAPE, "initializeTriggerWaveform() not implemented: %d", type);
@@ -866,13 +860,8 @@ void TriggerWaveform::initializeTriggerWaveform(operation_mode_e triggerOperatio
 	case trigger_type_e::TT_VIPER_V10_CRANK:
 =======
 	case trigger_type_e::TT_CITROEN_CX_145M1_CRANK:
-		setShapeDefinitionError(true);
-		warning(ObdCode::CUSTOM_ERR_NO_SHAPE, "Citroen CX trigger placeholder: %d", triggerType.type);
-		break;
-    
 	case trigger_type_e::TT_CITROEN_CX_145P1_CRANK:
-		setShapeDefinitionError(true);
-		warning(ObdCode::CUSTOM_ERR_NO_SHAPE, "Citroen CX trigger placeholder: %d", triggerType.type);
+		initializeCitroenCxStub(this);
 		break;
     
 >>>>>>> 5dacc23ae8 (Add Citroen CX trigger enum hooks)

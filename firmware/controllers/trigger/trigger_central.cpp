@@ -853,7 +853,48 @@ void TriggerCentral::handleShaftSignal(trigger_event_e signal, efitick_t timesta
 
 
 	// START CX Specific triggering
-	if (handleCitroenCxTrigger(triggerType, signal, timestamp)) {
+	if (triggerType == trigger_type_e::TT_CITROEN_CX_145M1_CRANK ||
+		triggerType == trigger_type_e::TT_CITROEN_CX_145P1_CRANK) {
+
+		handleCitroenCxTrigger(triggerType, signal, timestamp);
+
+		const auto& cx = getCitroenCxTriggerState();
+
+		if (!cx.crankSynced || signal != SHAFT_PRIMARY_RISING) {
+			return;
+		}
+
+		static constexpr float CX_TOOTH_SPACING = 360.0f / 145.0f;
+		float currentPhaseFromSyncPoint = cx.toothIndex * CX_TOOTH_SPACING;
+		float nextPhaseFromSyncPoint = ((cx.toothIndex + 1) % 145) * CX_TOOTH_SPACING;
+
+		currentEngineDecodedPhase = wrapAngleMethod(
+				currentPhaseFromSyncPoint - tdcPosition(),
+				"cxEnginePhase", ObdCode::CUSTOM_ERR_6555);
+
+		{
+			chibios_rt::CriticalSectionLocker csl;
+			m_lastToothTimer.reset(timestamp);
+			m_lastToothPhaseFromSyncPoint = currentPhaseFromSyncPoint;
+		}
+
+		int triggerIndexForListeners = cx.toothIndex;
+
+		reportEventToWaveChart(signal, triggerIndexForListeners, /*addOppositeEvent=*/true);
+
+		rpmShaftPositionCallback(signal, triggerIndexForListeners, timestamp);
+
+		tdcMarkCallback(triggerIndexForListeners, timestamp);
+
+		float nextPhase = wrapAngleMethod(
+				nextPhaseFromSyncPoint - tdcPosition(),
+				"cxNextPhase", ObdCode::CUSTOM_ERR_6555);
+
+		expectedNextPhase = nextPhase + tdcPosition();
+
+		mainTriggerCallback(triggerIndexForListeners, timestamp,
+				currentEngineDecodedPhase, nextPhase);
+
 		return;
 	}
 	// END CX Specific triggering
