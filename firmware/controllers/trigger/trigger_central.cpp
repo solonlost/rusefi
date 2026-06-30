@@ -860,6 +860,16 @@ void TriggerCentral::handleShaftSignal(trigger_event_e signal, efitick_t timesta
 
 		const auto& cx = getCitroenCxTriggerState();
 
+		if (signal == SHAFT_SECONDARY_RISING) {
+			handleVvtCamSignal(TriggerValue::RISE, timestamp, /*index=*/0);
+			return;
+		}
+
+		if (signal == SHAFT_SECONDARY_FALLING) {
+			handleVvtCamSignal(TriggerValue::FALL, timestamp, /*index=*/0);
+			return;
+		}
+
 		if (!cx.crankSynced || signal != SHAFT_PRIMARY_RISING) {
 			return;
 		}
