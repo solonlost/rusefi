@@ -261,15 +261,12 @@ enum class trigger_type_e : uint32_t {
 
 	// we assume this is NOT ready/NOT working? https://github.com/rusefi/rusefi/pull/9262
 	TT_SUZUKI_G16B = 95,
-<<<<<<< HEAD
 	TT_VIPER_V10_CRANK = 96,
 	TT_VVT_MITSUBISHI_6G75 = 97,
 	TT_UNUSED_98 = 98,
-=======
-
-	TT_CITROEN_CX_145P1_CRANK = 96,
-	TT_CITROEN_CX_145M1_CRANK = 97,
->>>>>>> 5dacc23ae8 (Add Citroen CX trigger enum hooks)
+	// Citroen CX 145-tooth flywheel trigger (>PWM_PHASE_MAX_COUNT, custom decoder)
+	TT_CITROEN_CX_145P1_CRANK = 99,
+	TT_CITROEN_CX_145M1_CRANK = 100,
 
 	// TL,DR https://github.com/rusefi/rusefi/commit/523805138589585cc8889d6afd9305d120180902 example of new trigger commit
 	//
@@ -282,11 +279,7 @@ enum class trigger_type_e : uint32_t {
 	//
 	// Another point: once you add a new trigger, run get_trigger_images.bat which would run rusefi_test.exe from unit_tests
 	//
-<<<<<<< HEAD
-=======
-	TT_UNUSED_98 = 98,
->>>>>>> 5dacc23ae8 (Add Citroen CX trigger enum hooks)
-	TT_UNUSED = 99, // this is used if we want to iterate over all trigger types
+	TT_UNUSED = 101, // this is used if we want to iterate over all trigger types
 };
 
 typedef enum {

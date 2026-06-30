@@ -856,15 +856,11 @@ void TriggerWaveform::initializeTriggerWaveform(operation_mode_e triggerOperatio
 		initializeJeepRenix66_2_2(this);
 		break;
 
-<<<<<<< HEAD
-	case trigger_type_e::TT_VIPER_V10_CRANK:
-=======
 	case trigger_type_e::TT_CITROEN_CX_145M1_CRANK:
 	case trigger_type_e::TT_CITROEN_CX_145P1_CRANK:
 		initializeCitroenCxStub(this);
 		break;
-    
->>>>>>> 5dacc23ae8 (Add Citroen CX trigger enum hooks)
+	case trigger_type_e::TT_VIPER_V10_CRANK:
 	case trigger_type_e::TT_UNUSED_98:
 	case trigger_type_e::TT_SUBARU_7_6_CRANK:
 		initializeSubaru7_6_crankOnly(this);

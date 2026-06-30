@@ -1,10 +1,6 @@
 #include "global.h"
 #include "engine_types.h"
-<<<<<<< HEAD
-// was generated automatically by rusEFI tool  from engine_types.h // by enum_to_string.jar tool on Fri May 15 00:29:24 UTC 2026
-=======
-// was generated automatically by rusEFI tool  from engine_types.h // by enum_to_string.jar tool on Sun Apr 12 15:11:52 CEST 2026
->>>>>>> 5dacc23ae8 (Add Citroen CX trigger enum hooks)
+// was generated automatically by rusEFI tool  from engine_types.h // by enum_to_string.jar tool on Tue Jun 30 23:36:03 CEST 2026
 // see also gen_config_and_enums.bat
 
 
@@ -377,17 +373,10 @@ const char *getTrigger_type_e(trigger_type_e value) {
 			return "TT_TRI_TACH";
 		case trigger_type_e::TT_UNUSED:
 			return "TT_UNUSED";
-<<<<<<< HEAD
 		case trigger_type_e::TT_UNUSED_98:
 			return "TT_UNUSED_98";
 		case trigger_type_e::TT_VIPER_V10_CRANK:
 			return "TT_VIPER_V10_CRANK";
-=======
-		case trigger_type_e::TT_UNUSED_39:
-			return "TT_UNUSED_39";
-		case trigger_type_e::TT_UNUSED_98:
-			return "TT_UNUSED_98";
->>>>>>> 5dacc23ae8 (Add Citroen CX trigger enum hooks)
 		case trigger_type_e::TT_VVT_BARRA_3_PLUS_1:
 			return "TT_VVT_BARRA_3_PLUS_1";
 		case trigger_type_e::TT_VVT_BOSCH_QUICK_START:
