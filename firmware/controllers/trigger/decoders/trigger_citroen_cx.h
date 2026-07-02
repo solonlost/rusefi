@@ -16,6 +16,10 @@ struct CitroenCxTriggerState {
 
 	int toothIndex = 0; // 0..144
 
+	// Which crank revolution of the 720-degree engine cycle we are in (0 or 1).
+	// Anchored by the cam pulse (145M1); meaningless for 145P1 until cam support exists.
+	uint8_t revolution = 0;
+
 	efitick_t lastPrimaryRise = 0;
 	uint32_t lastToothPeriod = 0;
 

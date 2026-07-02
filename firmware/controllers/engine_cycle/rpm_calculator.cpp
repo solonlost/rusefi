@@ -335,6 +335,19 @@ void rpmShaftPositionCallback(trigger_event_e ckpSignalType,
 		rpmState->onNewEngineCycle();
 	}
 
+	// CX custom trigger: listener indices span 0..289, exceeding the
+	// PWM_PHASE_MAX_COUNT-sized instant RPM state, and the stub shape's
+	// eventAngles are meaningless for the 145-tooth wheel. Skip instant RPM;
+	// the once-per-cycle period math above provides RPM from the second
+	// cycle boundary onwards.
+	{
+		auto triggerType = engine->triggerCentral.primaryTriggerConfiguration.TriggerType.type;
+		if (triggerType == trigger_type_e::TT_CITROEN_CX_145M1_CRANK
+				|| triggerType == trigger_type_e::TT_CITROEN_CX_145P1_CRANK) {
+			return;
+		}
+	}
+
 
 	// Always update instant RPM even when not spinning up
 	engine->triggerCentral.instantRpm.updateInstantRpm(

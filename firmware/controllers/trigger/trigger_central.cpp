@@ -356,6 +356,22 @@ void handleVvtCamSignal(TriggerValue front, efitick_t nowNt, int index) {
 		warning(ObdCode::CUSTOM_VVT_MODE_NOT_SELECTED, "VVT: event on %d but no mode", camIndex);
 	}
 
+	// START CX Specific: with the CX custom decoder the cam Hall arrives here via the
+	// VVT input path (camInputs[0]), NOT as a SHAFT_SECONDARY signal in handleShaftSignal.
+	// Feed it to the CX decoder, and mirror the resulting crank sync into the standard
+	// decoder state so the VVT engine-sync machinery below is allowed to run
+	// (it is gated on triggerState.getShaftSynchronized(), which is otherwise only
+	// set inside decodeTriggerEvent - a path the CX decoder bypasses entirely).
+	{
+		auto cxTriggerType = tc->primaryTriggerConfiguration.TriggerType.type;
+		if (cxTriggerType == trigger_type_e::TT_CITROEN_CX_145M1_CRANK
+				&& front == TriggerValue::RISE && index == 0) {
+			handleCitroenCxTrigger(cxTriggerType, SHAFT_SECONDARY_RISING, nowNt);
+			tc->triggerState.setShaftSynchronized(true);
+		}
+	}
+	// END CX Specific
+
 	const auto& vvtShape = tc->vvtShape[camIndex];
 
 	bool isVvtWithRealDecoder = vvtWithRealDecoder(engineConfiguration->vvtMode[camIndex]);
@@ -559,6 +575,9 @@ void handleShaftSignal(int signalIndex, bool isRising, efitick_t timestamp) {
 
 void TriggerCentral::resetCounters() {
 	memset(hwEventCounters, 0, sizeof(hwEventCounters));
+	// CX custom decoder keeps its own sync state outside TriggerDecoderBase;
+	// a stall must not leave stale toothIndex/sync flags for the next start.
+	resetCitroenCxTriggerState();
 }
 
 static const int wheelIndeces[4] = { 0, 0, 1, 1};
@@ -860,23 +879,35 @@ void TriggerCentral::handleShaftSignal(trigger_event_e signal, efitick_t timesta
 
 		const auto& cx = getCitroenCxTriggerState();
 
-		if (signal == SHAFT_SECONDARY_RISING) {
-			handleVvtCamSignal(TriggerValue::RISE, timestamp, /*index=*/0);
-			return;
-		}
-
-		if (signal == SHAFT_SECONDARY_FALLING) {
-			handleVvtCamSignal(TriggerValue::FALL, timestamp, /*index=*/0);
-			return;
-		}
-
+		// Note: cam pulses never arrive here. With the cam Hall on camInputs[0] they
+		// go straight to handleVvtCamSignal (see the CX hook there), and this stub
+		// shape has needSecondTriggerInput == false so handleShaftSignal() drops
+		// secondary events before this method is even called.
 		if (!cx.crankSynced || signal != SHAFT_PRIMARY_RISING) {
 			return;
 		}
 
-		static constexpr float CX_TOOTH_SPACING = 360.0f / 145.0f;
-		float currentPhaseFromSyncPoint = cx.toothIndex * CX_TOOTH_SPACING;
-		float nextPhaseFromSyncPoint = ((cx.toothIndex + 1) % 145) * CX_TOOTH_SPACING;
+		// Mirror CX sync into the standard decoder state; setShaftSynchronized is
+		// otherwise only called inside decodeTriggerEvent, which we bypass.
+		if (!triggerState.getShaftSynchronized()) {
+			triggerState.setShaftSynchronized(true);
+		}
+
+		static constexpr int CX_TOOTH_COUNT = 145;
+		static constexpr float CX_TOOTH_SPACING = 360.0f / CX_TOOTH_COUNT;
+
+		// Extend crank angle into 720-degree engine space using the cam-anchored
+		// revolution bit. Index 0 = first tooth after the cam pulse.
+		int revolution = cx.revolution;
+		float currentPhaseFromSyncPoint = cx.toothIndex * CX_TOOTH_SPACING + revolution * 360.0f;
+
+		int nextTooth = cx.toothIndex + 1;
+		int nextRevolution = revolution;
+		if (nextTooth >= CX_TOOTH_COUNT) {
+			nextTooth = 0;
+			nextRevolution ^= 1;
+		}
+		float nextPhaseFromSyncPoint = nextTooth * CX_TOOTH_SPACING + nextRevolution * 360.0f;
 
 		currentEngineDecodedPhase = wrapAngleMethod(
 				currentPhaseFromSyncPoint - tdcPosition(),
@@ -888,7 +919,9 @@ void TriggerCentral::handleShaftSignal(trigger_event_e signal, efitick_t timesta
 			m_lastToothPhaseFromSyncPoint = currentPhaseFromSyncPoint;
 		}
 
-		int triggerIndexForListeners = cx.toothIndex;
+		// 0..289 across the full 720-degree cycle; fires 0 exactly once per cycle,
+		// which rpmShaftPositionCallback relies on for its RPM period math.
+		int triggerIndexForListeners = cx.toothIndex + revolution * CX_TOOTH_COUNT;
 
 		reportEventToWaveChart(signal, triggerIndexForListeners, /*addOppositeEvent=*/true);
 
