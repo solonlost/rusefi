@@ -12,6 +12,7 @@ enum class CxSyncSource {
 
 // Tooth geometry shared by all CX 145-tooth variants
 static constexpr int CX_TOOTH_COUNT = 145;
+static constexpr float CX_TOOTH_SPACING = 360.0f / CX_TOOTH_COUNT;
 // Base (145M1): cam parks the counter so the very next tooth starts the cycle.
 static constexpr int CX_BASE_PARK_INDEX = 144;
 // Cam-check variant: park 8 teeth earlier so the cam sits ~20 degrees before the

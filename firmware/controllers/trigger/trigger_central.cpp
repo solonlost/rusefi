@@ -899,9 +899,6 @@ void TriggerCentral::handleShaftSignal(trigger_event_e signal, efitick_t timesta
 			triggerState.setShaftSynchronized(true);
 		}
 
-		static constexpr int CX_TOOTH_COUNT = 145;
-		static constexpr float CX_TOOTH_SPACING = 360.0f / CX_TOOTH_COUNT;
-
 		// Extend crank angle into 720-degree engine space using the cam-anchored
 		// revolution bit. Index 0 = first tooth after the cam pulse.
 		int revolution = cx.revolution;
