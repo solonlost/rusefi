@@ -49,6 +49,7 @@ static const std::unordered_set<std::string>& getLogDisabledTests() {
 		"realCrankingVQ40.normalCrankingSyncCam2",
 		"realCas24Plus1.spinningOnBench",
 		"realCitroenCx.cranking145M1",
+		"realCitroenCx.camCheckRealData",
 		"real4b11.running",
 		"real4b11.runningDoubledEdge",
 		"real4g93.cranking",

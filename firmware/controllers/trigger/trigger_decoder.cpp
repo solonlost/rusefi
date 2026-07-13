@@ -126,8 +126,7 @@ void TriggerWaveform::initializeSyncPoint(TriggerDecoderBase& state,
 			const TriggerConfiguration& triggerConfiguration) {
 	// CX 145-tooth triggers use a custom decoder that bypasses TriggerWaveform.
 	// The stub shape cannot pass findTriggerZeroEventIndex, so skip it.
-	if (triggerConfiguration.TriggerType.type == trigger_type_e::TT_CITROEN_CX_145M1_CRANK ||
-	    triggerConfiguration.TriggerType.type == trigger_type_e::TT_CITROEN_CX_145P1_CRANK) {
+	if (isCitroenCxTrigger(triggerConfiguration.TriggerType.type)) {
 		triggerShapeSynchPointIndex = 0;
 		return;
 	}

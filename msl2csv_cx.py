@@ -86,7 +86,44 @@ def convert_msl(msl_path, csv_path):
     write_csv(csv_path, rows_out)
 
 
-def synthetic(csv_path, rpm=200, revolutions=8):
+def synthetic_p1(csv_path, rpm=200, revolutions=8, cam_from_rev=4):
+    """Three-channel 145P1: ch1 = 145-tooth ring gear, ch2 = single flywheel
+    tooth once per 360 (at tooth 100), cam once per 720 arriving only from
+    cam_from_rev onward - proves crank sync and RPM exist before any cam pulse
+    (wasted-spark capable start), full sync after."""
+    rows_out = [(0.0, (0, 0, 0))]
+    states = [0, 0, 0]
+    rev_period = 60.0 / rpm
+    tooth_dt = rev_period / 145
+    t = 0.05
+    for rev in range(revolutions):
+        for tooth in range(145):
+            states[0] = 1; rows_out.append((t, tuple(states)))
+            states[0] = 0; rows_out.append((t + tooth_dt * 0.4, tuple(states)))
+            if tooth == 100:
+                # flywheel single tooth, mid-gap after ring tooth 100
+                st = t + tooth_dt * 0.5
+                states[1] = 1; rows_out.append((st, tuple(states)))
+                states[1] = 0; rows_out.append((st + tooth_dt * 0.3, tuple(states)))
+            if rev >= cam_from_rev and rev % 2 == 1 and tooth == 30:
+                ct = t + tooth_dt * 0.45
+                states[2] = 1; rows_out.append((ct, tuple(states)))
+                states[2] = 0; rows_out.append((ct + tooth_dt * 2, tuple(states)))
+            t += tooth_dt
+    write_csv3(csv_path, rows_out)
+
+
+def write_csv3(csv_path, rows_out):
+    rows_out.sort(key=lambda r: r[0])
+    with open(csv_path, "w", newline="") as f:
+        w = csv.writer(f, lineterminator="\n")
+        w.writerow(["Time [s]", "crank", "crank2", "cam"])
+        for t, (a, b, c) in rows_out:
+            w.writerow([f"{t:.9f}", a, b, c])
+    print(f"wrote {len(rows_out)} rows to {csv_path}")
+
+
+def synthetic(csv_path, rpm=200, revolutions=8, drop_teeth_at=None):
     """Ideal 145-tooth crank + once-per-720 cam at constant cranking speed.
     Cam rise placed between crank teeth ~40% into revolution pairs 1,3,5..."""
     rows_out = [(0.0, (0, 0))]
@@ -96,12 +133,18 @@ def synthetic(csv_path, rpm=200, revolutions=8):
     t = 0.05
     for rev in range(revolutions):
         for tooth in range(145):
-            rise = t
-            fall = t + tooth_dt * 0.4
-            states[0] = 1
-            rows_out.append((rise, tuple(states)))
-            states[0] = 0
-            rows_out.append((fall, tuple(states)))
+            # drop_teeth_at=(rev, first_tooth, count): suppress VR edges to
+            # simulate genuine count corruption (sensor dropout)
+            dropped = (drop_teeth_at is not None
+                       and rev == drop_teeth_at[0]
+                       and drop_teeth_at[1] <= tooth < drop_teeth_at[1] + drop_teeth_at[2])
+            if not dropped:
+                rise = t
+                fall = t + tooth_dt * 0.4
+                states[0] = 1
+                rows_out.append((rise, tuple(states)))
+                states[0] = 0
+                rows_out.append((fall, tuple(states)))
             # cam pulse once per 720 deg, mid-tooth-58 of odd revolutions
             if rev % 2 == 1 and tooth == 58:
                 cam_rise = t + tooth_dt * 0.45
@@ -127,6 +170,11 @@ def write_csv(csv_path, rows_out):
 if __name__ == "__main__":
     if len(sys.argv) == 3 and sys.argv[1] == "--synthetic":
         synthetic(sys.argv[2])
+    elif len(sys.argv) == 3 and sys.argv[1] == "--synthetic-corrupt":
+        # 5 teeth dropped in revolution 4: cam-check variant must re-anchor exactly once
+        synthetic(sys.argv[2], drop_teeth_at=(4, 60, 5))
+    elif len(sys.argv) == 3 and sys.argv[1] == "--synthetic-p1":
+        synthetic_p1(sys.argv[2])
     elif len(sys.argv) == 3:
         convert_msl(sys.argv[1], sys.argv[2])
     else:

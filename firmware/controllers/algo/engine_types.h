@@ -267,6 +267,9 @@ enum class trigger_type_e : uint32_t {
 	// Citroen CX 145-tooth flywheel trigger (>PWM_PHASE_MAX_COUNT, custom decoder)
 	TT_CITROEN_CX_145P1_CRANK = 99,
 	TT_CITROEN_CX_145M1_CRANK = 100,
+	// 145M1 with cam-as-checker: cam anchors once, free-running count owns
+	// timing thereafter, cam re-anchors only on genuine count corruption
+	TT_CITROEN_CX_145_CAM_CHECK = 101,
 
 	// TL,DR https://github.com/rusefi/rusefi/commit/523805138589585cc8889d6afd9305d120180902 example of new trigger commit
 	//
@@ -279,7 +282,7 @@ enum class trigger_type_e : uint32_t {
 	//
 	// Another point: once you add a new trigger, run get_trigger_images.bat which would run rusefi_test.exe from unit_tests
 	//
-	TT_UNUSED = 101, // this is used if we want to iterate over all trigger types
+	TT_UNUSED = 102, // this is used if we want to iterate over all trigger types
 };
 
 typedef enum {

@@ -857,8 +857,14 @@ void TriggerWaveform::initializeTriggerWaveform(operation_mode_e triggerOperatio
 		break;
 
 	case trigger_type_e::TT_CITROEN_CX_145M1_CRANK:
+	case trigger_type_e::TT_CITROEN_CX_145_CAM_CHECK:
+		initializeCitroenCxStub(this);
+		break;
 	case trigger_type_e::TT_CITROEN_CX_145P1_CRANK:
 		initializeCitroenCxStub(this);
+		// single added flywheel tooth arrives on the second trigger channel;
+		// without this flag handleShaftSignal() drops secondary events
+		needSecondTriggerInput = true;
 		break;
 	case trigger_type_e::TT_VIPER_V10_CRANK:
 	case trigger_type_e::TT_UNUSED_98:

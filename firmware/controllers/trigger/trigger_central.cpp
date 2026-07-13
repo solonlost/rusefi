@@ -44,6 +44,8 @@ TriggerCentral::TriggerCentral() :
 	setArrayValues(hwEventCounters, 0);
 	triggerState.resetState();
 	noiseFilter.resetAccumSignalData();
+	// CX custom decoder keeps state outside TriggerDecoderBase
+	resetCitroenCxTriggerState();
 }
 
 void TriggerNoiseFilter::resetAccumSignalData() {
@@ -364,10 +366,15 @@ void handleVvtCamSignal(TriggerValue front, efitick_t nowNt, int index) {
 	// set inside decodeTriggerEvent - a path the CX decoder bypasses entirely).
 	{
 		auto cxTriggerType = tc->primaryTriggerConfiguration.TriggerType.type;
-		if (cxTriggerType == trigger_type_e::TT_CITROEN_CX_145M1_CRANK
+		if (isCitroenCxTrigger(cxTriggerType)
 				&& front == TriggerValue::RISE && index == 0) {
-			handleCitroenCxTrigger(cxTriggerType, SHAFT_SECONDARY_RISING, nowNt);
-			tc->triggerState.setShaftSynchronized(true);
+			handleCitroenCxCamPulse(cxTriggerType);
+			// Mirror crank sync into the standard decoder so the VVT machinery
+			// below may run. On 145P1 the cam gives parity only; shaft sync
+			// arrives from the flywheel single tooth instead.
+			if (getCitroenCxTriggerState().crankSynced) {
+				tc->triggerState.setShaftSynchronized(true);
+			}
 		}
 	}
 	// END CX Specific
@@ -872,8 +879,7 @@ void TriggerCentral::handleShaftSignal(trigger_event_e signal, efitick_t timesta
 
 
 	// START CX Specific triggering
-	if (triggerType == trigger_type_e::TT_CITROEN_CX_145M1_CRANK ||
-		triggerType == trigger_type_e::TT_CITROEN_CX_145P1_CRANK) {
+	if (isCitroenCxTrigger(triggerType)) {
 
 		handleCitroenCxTrigger(triggerType, signal, timestamp);
 
@@ -1185,6 +1191,8 @@ void onConfigurationChangeTriggerCallback() {
 	#if EFI_ENGINE_CONTROL
 		engine->updateTriggerConfiguration();
 		getTriggerCentral()->noiseFilter.resetAccumSignalData();
+		// CX custom decoder state must not survive a trigger type change
+		resetCitroenCxTriggerState();
 	#endif
 	}
 #if EFI_DETAILED_LOGGING

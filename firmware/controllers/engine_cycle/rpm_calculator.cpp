@@ -16,6 +16,7 @@
 #include "pch.h"
 
 #include "trigger_central.h"
+#include "trigger_citroen_cx.h"
 
 #include "engine_sniffer.h"
 
@@ -342,8 +343,7 @@ void rpmShaftPositionCallback(trigger_event_e ckpSignalType,
 	// cycle boundary onwards.
 	{
 		auto triggerType = engine->triggerCentral.primaryTriggerConfiguration.TriggerType.type;
-		if (triggerType == trigger_type_e::TT_CITROEN_CX_145M1_CRANK
-				|| triggerType == trigger_type_e::TT_CITROEN_CX_145P1_CRANK) {
+		if (isCitroenCxTrigger(triggerType)) {
 			return;
 		}
 	}

@@ -233,6 +233,8 @@ const char *getTrigger_type_e(trigger_type_e value) {
 			return "TT_CHRYSLER_PHASER";
 		case trigger_type_e::TT_CITROEN_CX_145M1_CRANK:
 			return "TT_CITROEN_CX_145M1_CRANK";
+		case trigger_type_e::TT_CITROEN_CX_145_CAM_CHECK:
+			return "TT_CITROEN_CX_145_CAM_CHECK";
 		case trigger_type_e::TT_CITROEN_CX_145P1_CRANK:
 			return "TT_CITROEN_CX_145P1_CRANK";
 		case trigger_type_e::TT_CUSTOM_1:
